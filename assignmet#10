@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Mar 17 21:53:03 2019
+
+@author: ed
+"""
+
+
+#Ed Alfargalla
+
+#3-17-19
+
+#assignment#10
+#pie chart 
+
+# import the libraries needed for this project
+import stocks
+import json
+import csv
+#from mpl_finance import candlestick_ohlc
+import matplotlib.pyplot as plt
+import matplotlib
+from datetime import datetime
+import numpy as np
+
+#assign the urls of files
+filePath = '/Users/ed/Desktop/PycharmProjects/untitled/venv/AllStocks.json'
+workspace = '/Users/ed/Desktop/PycharmProjects/untitled/venv/'
+stock_file = workspace + "/" + 'Lesson6_Data_Stocks.csv'
+with open(filePath) as f:
+    dataFile = json.load(f)
+
+
+stockDict = {}
+
+readFile = open(stock_file, 'r')
+
+header = readFile.readline()
+header = header.rstrip()
+headerSplit = header.split(',')
+#print(headerSplit)
+
+symbolIndex = headerSplit.index('SYMBOL')
+no_sharesIndex = headerSplit.index('NO_SHARES')
+purch_pricIndex = headerSplit.index('PURCHASE_PRICE')
+curr_valueIndex = headerSplit.index('CURRENT_VALUE')
+purch_datIndex = headerSplit.index('PURCHASE_DATE')
+
+stockdictionary = {}
+
+# looping through the csv file and grabe the stock share and append them to a list
+valueList = []
+#looping through the data of stockdictionary
+for row in readFile:
+	row = row.rstrip()
+	#print(row)
+	lineSplit = row.split(',')
+	#print(lineSplit)
+	stock_name = lineSplit[0]
+	#print(stock_name)
+	stockdictionary[stock_name] = lineSplit
+readFile.close()
+
+#print(stockdictionary)
+for key, value in stockdictionary.items():
+    #print(value)
+    value1 = value[1]
+    valueList.append(int(value1))
+    #print(value1)
+
+#print(valueList)
+# loop through the data and import the stocks class to find the data needed
+for item in dataFile:
+    if item['Symbol'] not in stockDict:
+        newStock = stocks.Stock(item['Symbol'], item['Open'], item['High'], item['Low'], item['Volume'])
+        #print(item['Symbol'] + "added")
+        stockDict[item['Symbol']] = {'stocks': newStock}
+        #print(stockDict)
+    stockDict[item['Symbol']]['stocks'].addPrice(item['Close'], datetime.strptime(item['Date'], '%d-%b-%y'))
+    # print (item['Symbol'], item['Close'])
+
+#print(stockDict)
+listStock =[]
+#loop through the dictionary and append the values of the close price to a list
+for item in stockDict:
+    closes = stockDict[item]['stocks'].stockPriceList
+    #print(closes)
+    for i in closes:
+        #print(i)
+        if i == 65.08:
+            listStock.append(i)
+        if i == 10.95:
+            listStock.append(i)
+        if i == 196.62:
+            listStock.append(i)
+        if i == 927.96:
+            listStock.append(i)
+        if i == 145.16:
+            listStock.append(i)
+        if i == 23.3:
+            listStock.append(i)
+        if i == 72.68:
+            listStock.append(i)
+        if i == 57.34:
+            listStock.append(i)
+
+firstList = np.array(valueList)
+secondList = np.array(listStock)
+
+ab = np.multiply(firstList,secondList)
+
+#set the pie chart 
+labels = ['Google', 'Microsoft', 'RDS-A', 'AIG','FB','M','F','IBM']
+sizes = ab
+colors = ['green', 'silver', 'red', 'brown', 'blue', 'yellow','pink','gold']
+patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
+plt.legend(patches, labels, loc="best")
+plt.axis('equal')
+plt.tight_layout()
+plt.show()
